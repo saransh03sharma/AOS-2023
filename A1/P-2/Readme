@@ -1,0 +1,4 @@
+compile: make
+insert LKM: sudo insmod partb_1_20CS10085_20CS30065.ko
+remove LKM: sudo rmmod partb_1_20CS10085_20CS30065.ko
+delete: make clean
