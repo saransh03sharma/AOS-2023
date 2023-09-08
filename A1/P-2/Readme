@@ -2,3 +2,18 @@ compile: make
 insert LKM: sudo insmod partb_1_20CS10085_20CS30065.ko
 remove LKM: sudo rmmod partb_1_20CS10085_20CS30065.ko
 delete: make clean
+
+to test:    gcc textx.C
+            ./a.out
+
+possible errors and thier solutions:
+  1. 
+    /usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o: in function `_start':
+    (.text+0x24): undefined reference to `main'
+    collect2: error: ld returned 1 exit status
+  Solution: run dos2unix testx.c where x is 1,2,3....
+
+  2. 
+    Skipping BTF generation xxx. due to unavailability of vmlinux on Ubuntu 21.04
+  Solution: sudo apt install dwarves
+            sudo cp /sys/kernel/btf/vmlinux /usr/lib/modules/`uname -r`/build/
