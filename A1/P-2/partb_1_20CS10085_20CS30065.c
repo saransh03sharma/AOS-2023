@@ -425,7 +425,7 @@ static ssize_t execute_write(struct process_node *process) {
     if (process->state == PROCESS_INIT) 
     {
         //if the process writes anything greater than 1 byte
-        if (process_buffer_size > 1ul) 
+        if (process_buffer_size != 1ul) 
         {
             printk(KERN_ALERT "Error: Buffer size must be of 1 byte\n");
             return -EINVAL;
@@ -452,7 +452,7 @@ static ssize_t execute_write(struct process_node *process) {
     } 
     else if (process->state == PROCESS_R_W) 
     {
-        if (process_buffer_size > 4ul) 
+        if (process_buffer_size != 4ul) 
         {
             printk(KERN_ALERT "Error: Input should be of 4 bytes\n");
             return -EINVAL;
