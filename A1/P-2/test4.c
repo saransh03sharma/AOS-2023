@@ -21,7 +21,7 @@ void execute(int val[], int n) {
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n-3; ++i) {
         ret = write(fd, &val[i], sizeof(int));
         if (ret == -1) {
             perror("write");
@@ -43,15 +43,28 @@ void execute(int val[], int n) {
     printf("[Proc %d] Read: %d, Return: %zd\n", getpid(), out, ret);
     usleep(100);
 
-    int x = 101;
-    ret = write(fd, &x, sizeof(int));
+    out;
+    ret = read(fd, &out, sizeof(int));
     if (ret == -1) {
-        perror("write");
+        perror("read");
         close(fd);
         exit(EXIT_FAILURE);
     }
-    printf("[Proc %d] Write: %d, Return: %zd\n", getpid(), x, ret);
+    
+    printf("[Proc %d] Read: %d, Return: %zd\n", getpid(), out, ret);
     usleep(100);
+
+    for (int i = 0; i < n; ++i) {
+        int x = (i+2)*10+(i%2);
+        ret = write(fd,&x , sizeof(int));
+        if (ret == -1) {
+            perror("write");
+            close(fd);
+            exit(EXIT_FAILURE);
+        }
+        printf("[Proc %d] Write: %d, Return: %zd\n", getpid(), x, ret);
+        usleep(100);
+    }
 
     for (int i = 0; i < n; ++i) {
         int out;
@@ -65,15 +78,7 @@ void execute(int val[], int n) {
         usleep(100);
     }
     
-    //empty read
-    ret = read(fd, &out, sizeof(int));
-    if (ret == -1) {
-        perror("read");
-        close(fd);
-        exit(EXIT_FAILURE);
-    }
-        
-    close(fd);
+
 }
 
 int main(void) {

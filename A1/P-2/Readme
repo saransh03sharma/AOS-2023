@@ -1,19 +1,51 @@
-compile: make
-insert LKM: sudo insmod partb_1_20CS10085_20CS30065.ko
-remove LKM: sudo rmmod partb_1_20CS10085_20CS30065.ko
-delete: make clean
+# Part B - Linux Kernel Module (LKM) and Test Program
+##  Group Members:
+  ### Pranav Mehrotra 20CS10085
+  ### Saransh Sharma  20CS30065
+This repository contains code for a Linux Kernel Module (LKM) and a corresponding test program. These instructions will guide you on how to compile and use the LKM and test program, as well as provide solutions to common errors.
 
-to test:    gcc textx.C
-            ./a.out
+## Table of Contents
+- [1. Compilation](#1-compilation)
+  - [1.1. Compile Code](#11-compile-code)
+  - [1.2. Insert LKM](#12-insert-lkm)
+  - [1.3. Remove LKM](#13-remove-lkm)
+  - [1.4. Delete Compiled Files](#14-delete-compiled-files)
+- [2. Usage](#2-usage)
+- [3. Possible Errors and Solutions](#3-possible-errors-and-solutions)
 
-possible errors and thier solutions:
-  1. 
-    /usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o: in function `_start':
-    (.text+0x24): undefined reference to `main'
-    collect2: error: ld returned 1 exit status
-  Solution: run dos2unix testx.c where x is 1,2,3....
+## 1. Compilation
 
-  2. 
-    Skipping BTF generation xxx. due to unavailability of vmlinux on Ubuntu 21.04
-  Solution: sudo apt install dwarves
-            sudo cp /sys/kernel/btf/vmlinux /usr/lib/modules/`uname -r`/build/
+### 1.1. Compile Code
+#### Type the following command in the terminal to compile the code: make
+
+### 1.2. Insert LKM
+#### Type the following command in the terminal to insert the LKM: sudo insmod partb_1_20CS10085_20CS30065.ko
+
+### 1.3. Remove LKM
+#### Type the following command in the terminal to remove the LKM: sudo rmmod partb_1_20CS10085_20CS30065.ko
+
+### 1.4. Delete Compiled Files
+#### Type the following command in the terminal to delete the compiled files: make clean
+
+## 2. Usage
+#### Type the following command in the terminal to run the test program:
+gcc testx.c
+./a.out
+where x = 1,2,3,4,5
+
+## 3. Possible Errors and Solutions
+If you get the following error while inserting the LKM:
+
+#### 3.1. Error: Undefined Reference to Main
+Error message: /usr/bin/ld: /usr/lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/Scrt1.o: in function `_start':
+(.text+0x24): undefined reference to `main'
+collect2: error: ld returned 1 exit status
+
+Solution: : Run dos2unix on your source file, where x is the number of the test (e.g., test1.c, test2.c, etc.).
+
+#### 3.2. Error: Skipping BTF Generation
+Error message: Skipping BTF generation xxx. due to unavailability of vmlinux on Ubuntu 21.04
+
+Solution:
+1. Install 'dwarves' by running: sudo apt install dwarves
+2. Copy vmlinux: sudo cp /sys/kernel/btf/vmlinux /usr/lib/modules/$(uname -r)/build/
