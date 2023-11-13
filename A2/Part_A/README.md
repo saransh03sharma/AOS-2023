@@ -1,23 +1,20 @@
-# Part - B
+# Part - A
 ## 1. eBPF Program
 ### 1.1. Commands to compile and load the eBPF program
 ```
-clang -O2 -Wall -target bpf -c load_balancer.c -o load_balancer.o
+clang -O2 -Wall -target bpf -c xdp_drop.c -o xdp_drop.o
 sudo ip link set dev lo xdpgeneric off
-sudo ip link set dev lo xdpgeneric obj load_balancer.o sec xdp_load_balancer
+sudo ip link set dev lo xdpgeneric obj xdp_drop.o sec xdp_drop
 ```
 
 ## 2. Client and Server
 ### 2.1. Commands to compile and run the client and server
-#### Execute the following commands in 4 different terminals
-Run 3 servers on ports 13000, 13001 and 13002
+Server:
 ```
-gcc -o server server.c -lpthread
+gcc -o server server.c
 ./server
-
-<Input Port Number(13000, 13001 or 13002)>
 ```
-Run the client
+Client:
 ```
 gcc -o client client.c
 ./client
