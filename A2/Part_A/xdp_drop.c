@@ -17,7 +17,7 @@ int packet_dropper(struct xdp_md *ctx) {
     if (eth + 1 > (struct ethhdr *)ctx->data_end) {
         return XDP_PASS;
     }
-    // Check if the packet is an IPv4 packet
+    // Check if the packet is an IP packet
     if (eth->h_proto != htons(ETH_P_IP)) {
         return XDP_PASS;
     }
