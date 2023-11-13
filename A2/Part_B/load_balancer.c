@@ -30,7 +30,7 @@ struct bpf_map_def SEC("maps") free_threads_map = {
 };
 
 SEC("xdp_load_balancer")
-int xdp_load_balancer(struct xdp_md* ctx){
+int load_balancer(struct xdp_md* ctx){
     void *data = (void*)(long)ctx->data;
     struct ethhdr *eth = data;
     if(eth + 1 > (struct ethhdr*)ctx->data_end){
@@ -51,7 +51,7 @@ int xdp_load_balancer(struct xdp_md* ctx){
     if(udp + 1 > (struct udphdr*)ctx->data_end){
         return XDP_PASS;
     }
-    if(ntohs(udp->dest) != 8080){
+    if(ntohs(udp->dest) != LOAD_BALANCER_PORT){
         return XDP_PASS;
     }
     void *payload = (void *)(udp + 1);
@@ -60,19 +60,20 @@ int xdp_load_balancer(struct xdp_md* ctx){
     }
     int *payloadData = (int *)payload;
     bpf_printk("Recieved %d", *payloadData);
-    int index = NUM_THREADS;
+    int index = NUM_SERVERS;
     int *init_flag = bpf_map_lookup_elem(&free_threads_map, &index);
     if(init_flag == NULL){
         bpf_printk("Error in looking up free_threads_map\n");
-        return XDP_PASS;
+        return XDP_DROP;
     }
     if(*init_flag == 0){
         bpf_printk("Initializing free_threads_map, with threads per server = %d\n", NUM_THREADS);
         for(int i = 0;i < NUM_SERVERS;i++){
-            int *server_thread = bpf_map_lookup_elem(&free_threads_map, &i);
+            index = i;
+            int *server_thread = bpf_map_lookup_elem(&free_threads_map, &index);
             if(server_thread == NULL){
                 bpf_printk("Error in looking up free_threads_map\n");
-                return XDP_PASS;
+                return XDP_DROP;
             }
             *server_thread = NUM_THREADS;
         }
@@ -88,13 +89,13 @@ int xdp_load_balancer(struct xdp_md* ctx){
             int *front = bpf_map_lookup_elem(&queue, &index);
             if(front == NULL){
                 bpf_printk("Error in looking up queue\n");
-                return XDP_PASS;
+                return XDP_DROP;
             }
             index = MAX_QUEUE_SIZE + 1;
             int *back = bpf_map_lookup_elem(&queue, &index);
             if(back == NULL){
                 bpf_printk("Error in looking up queue\n");
-                return XDP_PASS;
+                return XDP_DROP;
             }
             if(*front == *back){
                 bpf_printk("Queue empty, incrementing number of free threads of server %d\n", i);
@@ -102,7 +103,7 @@ int xdp_load_balancer(struct xdp_md* ctx){
                 int *server_thread = bpf_map_lookup_elem(&free_threads_map, &index);
                 if(server_thread == NULL){
                     bpf_printk("Error in looking up free_threads_map\n");
-                    return XDP_PASS;
+                    return XDP_DROP;
                 }
                 *server_thread = *server_thread + 1;
                 return XDP_DROP;
@@ -112,7 +113,7 @@ int xdp_load_balancer(struct xdp_md* ctx){
             int *queueData = bpf_map_lookup_elem(&queue, &index);
             if(queueData == NULL){
                 bpf_printk("Error in looking up queue\n");
-                return XDP_PASS;
+                return XDP_DROP;
             }
             bpf_printk("Sending queued packet %d to server %d\n", *queueData, i);
             udp->dest = udp->source;
@@ -131,7 +132,7 @@ int xdp_load_balancer(struct xdp_md* ctx){
         int *server_thread = bpf_map_lookup_elem(&free_threads_map, &index);
         if(server_thread == NULL){
             bpf_printk("Error in looking up free_threads_map\n");
-            return XDP_PASS;
+            return XDP_DROP;
         }
         if(*server_thread > 0){
             bpf_printk("Sending packet to server %d\n", i);
@@ -147,13 +148,13 @@ int xdp_load_balancer(struct xdp_md* ctx){
     int *front = bpf_map_lookup_elem(&queue, &index);
     if(front == NULL){
         bpf_printk("Error in looking up queue\n");
-        return XDP_PASS;
+        return XDP_DROP;
     }
     index = MAX_QUEUE_SIZE + 1;
     int *back = bpf_map_lookup_elem(&queue, &index);
     if(back == NULL){
         bpf_printk("Error in looking up queue\n");
-        return XDP_PASS;
+        return XDP_DROP;
     }
     int nextBack = *back + 1;
     if(nextBack == MAX_QUEUE_SIZE)
@@ -166,7 +167,7 @@ int xdp_load_balancer(struct xdp_md* ctx){
     int *queueData = bpf_map_lookup_elem(&queue, &index);
     if(queueData == NULL){
         bpf_printk("Error in looking up queue\n");
-        return XDP_PASS;
+        return XDP_DROP;
     }
     *queueData = *payloadData;
     *back = nextBack;

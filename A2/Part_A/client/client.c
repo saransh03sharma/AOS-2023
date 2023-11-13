@@ -30,14 +30,14 @@ int main() {
         // sprintf(buffer, "%d", i);
         memcpy(buffer, &i, sizeof(int));
         n = sendto(client_socket, buffer, sizeof(int), 0, (struct sockaddr*)&server_addr, sizeof(server_addr));
-        if (n <= 0) {
+        if (n != sizeof(int)) {
             perror("Send failed");
             break;
         }
         printf("Sent data: %d\n", i);
-        printf("Sent bytes: %d\n", n);
+        // printf("Sent bytes: %d\n", n);
         i++;
-        sleep(2); // Add a delay between consecutive sends
+        sleep(15); // Add a delay between consecutive sends
     }
 
     close(client_socket);
