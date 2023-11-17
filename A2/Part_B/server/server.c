@@ -39,7 +39,7 @@ void handler_thread(void * param) {
         printf("Thread %d sleeping for %d seconds\n", id, payload);
         total_sleep_time += payload;
         sleep(payload);
-        printf("Thread %d awake, total sleep time: %d\n", id, total_sleep_time);
+        printf("Thread %d awake, total sleep time of this thread: %d\n", id, total_sleep_time);
         *payloadPointer = 0;
         n = sendto(server_socket, buffer, sizeof(int), 0, (struct sockaddr*)&balancer_addr, sizeof(balancer_addr));
         if (n!=sizeof(int)) {

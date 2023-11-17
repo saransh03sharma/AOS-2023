@@ -37,7 +37,7 @@ int main() {
         printf("Sent data: %d\n", i);
         // printf("Sent bytes: %d\n", n);
         i++;
-        sleep(15); // Add a delay between consecutive sends
+        sleep(10); // Add a delay between consecutive sends
     }
 
     close(client_socket);
